@@ -1,0 +1,44 @@
+name: Rename Package
+on:
+  workflow_call:
+    inputs:
+      old_package_name:
+        description: 'Old package name in AndroidManifest.xml'
+        required: true
+        type: string
+      new_package_name:
+        description: 'New package name in AndroidManifest.xml'
+        required: true
+        type: string
+jobs:
+  rename_package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Build project
+        run: ./gradlew build
+
+      - name: Install apkrename
+        run: |
+          npm install -g apkrename
+
+      - name: Rename Package
+        run: apkrename -f -o ${{ github.event.inputs.old_package_name }} ${{ github.event.inputs.new_package_name }} app.apk
+
+      - name: Clean up
+        run: |
+          apk del app.apk
+          npm uninstall -g apkrename
