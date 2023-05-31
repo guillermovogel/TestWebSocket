@@ -1,5 +1,8 @@
 name: Rename Package
 on:
+  push:
+    branches:
+      - main
   workflow_call:
     inputs:
       old_package_name:
@@ -10,6 +13,7 @@ on:
         description: 'New package name in AndroidManifest.xml'
         required: true
         type: string
+        
 jobs:
   rename_package:
     runs-on: ubuntu-latest
